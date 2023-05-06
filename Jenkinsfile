@@ -1,6 +1,6 @@
 pipeline {
    agent {
-     label 'go'
+     label 'node'
    }
 
    environment {
