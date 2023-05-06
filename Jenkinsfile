@@ -5,7 +5,7 @@ pipeline {
 
    environment {
      // the address of your Docker Hub registry
-     REGISTRY = 'docker.io'
+     REGISTRY = 'https://index.docker.io/v2/'
      // your Docker Hub username
      DOCKERHUB_USERNAME = 'omerevrencomtr'
      // Docker image name
