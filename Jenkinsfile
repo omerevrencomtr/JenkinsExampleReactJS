@@ -3,7 +3,7 @@
 pipeline {
   // Assign to docker agent(s) label, could also be 'any'
   agent {
-    label 'docker'
+    label 'base'
   }
 
   stages {
