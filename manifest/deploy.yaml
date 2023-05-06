@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: $PROJECT_NAME
+  name: devops-node-sample
+  labels:
+    app: devops-node-sample
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: devops-node-sample
+  template:
+    metadata:
+      labels:
+        app: devops-node-sample
+    spec:
+      containers:
+        - name: npm
+          image: $REGISTRY/$DOCKERHUB_USERNAME/$APP_NAME
