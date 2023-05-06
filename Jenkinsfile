@@ -1,6 +1,6 @@
 pipeline {
    agent {
-     label 'node'
+     label 'nodejs'
    }
 
    environment {
@@ -21,7 +21,7 @@ pipeline {
    stages {
      stage('docker login') {
        steps{
-         container ('node') {
+         container ('nodejs') {
            sh 'echo $DOCKERHUB_CREDENTIAL_PSW  | crictl login -u $DOCKERHUB_CREDENTIAL_USR --password-stdin'
          }
        }
@@ -29,7 +29,7 @@ pipeline {
 
      stage('build & push') {
        steps {
-         container ('node') {
+         container ('nodejs') {
            sh 'containerd build -t $REGISTRY/$DOCKERHUB_USERNAME/$APP_NAME .'
            sh 'containerd push $REGISTRY/$DOCKERHUB_USERNAME/$APP_NAME'
          }
@@ -37,7 +37,7 @@ pipeline {
      }
      stage ('deploy app') {
        steps {
-          container ('node') {
+          container ('nodejs') {
              withCredentials([
                kubeconfigFile(
                  credentialsId: env.KUBECONFIG_CREDENTIAL_ID,
