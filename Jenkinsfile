@@ -30,8 +30,7 @@ pipeline {
      stage('build & push') {
        steps {
          container ('node') {
-           sh 'git clone https://github.com/omerevrencomtr/JenkinsExampleReactJS.git'
-           sh 'cd JenkinsExampleReactJS && docker build -t $REGISTRY/$DOCKERHUB_USERNAME/$APP_NAME .'
+           sh 'docker build -t $REGISTRY/$DOCKERHUB_USERNAME/$APP_NAME .'
            sh 'docker push $REGISTRY/$DOCKERHUB_USERNAME/$APP_NAME'
          }
        }
