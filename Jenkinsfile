@@ -23,10 +23,8 @@ pipeline {
             steps {
                 script {
                     container('base') {
-                    withEnv(['DOCKER_TLS_VERIFY=0']) {
                         docker.withRegistry(REGISTRY, REGISTRY_CREDENTIAL) {
-                            dockerImage = docker.build(IMAGE_NAME, BUILD_ARGS)
-                        }
+                            dockerImage = docker.build(IMAGE_NAME, BUILD_ARGS, null)
                         }
                     }
                 }
