@@ -21,18 +21,18 @@ pipeline {
 
     stages {
         stage('sonarqube analysis') {
-              steps {
-                container('maven') {
-                  withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                    withSonarQubeEnv('sonar') {
-                      sh "mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN"
-                    }
-
-                  }
+          steps {
+            container('maven') {
+              withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                withSonarQubeEnv('sonar') {
+                  sh """
+                    mvn sonar:sonar -Dsonar.login=${SONAR_TOKEN}
+                  """
                 }
-
               }
             }
+          }
+        }
 
         stage('Build') {
             steps {
