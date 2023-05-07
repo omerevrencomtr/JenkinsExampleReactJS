@@ -24,7 +24,7 @@ pipeline {
                 script {
                     container('base') {
                         docker.withRegistry(DOCKER_REGISTRY, REGISTRY_CREDENTIAL) {
-                            dockerImage = docker.build(IMAGE_NAME, BUILD_ARGS, null)
+                            dockerImage = docker.build(IMAGE_NAME, BUILD_ARGS)
                         }
                     }
                 }
