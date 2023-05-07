@@ -9,7 +9,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = ''
-        REGISTRY = 'https://nexus.miateknoloji.io'
+        REGISTRY = 'http://172.16.161.30:5000'
         REGISTRY_CREDENTIAL = 'nexus-admin'
         IMAGE_NAME = 'omerevrencomtr/lamots'
         BUILD_ARGS = "-f Dockerfile . --network host"
