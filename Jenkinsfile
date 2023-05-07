@@ -25,9 +25,7 @@ pipeline {
             container('maven') {
               withCredentials([string(credentialsId: env.SONAR_CREDENTIAL_ID, variable: 'SONAR_TOKEN')]) {
                 withSonarQubeEnv('sonar') {
-                  sh """
-                    mvn sonar:sonar -Dsonar.login=${SONAR_TOKEN}
-                  """
+                  sh 'mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN'
                 }
               }
             }
