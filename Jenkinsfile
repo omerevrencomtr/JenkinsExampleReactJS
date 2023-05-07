@@ -22,7 +22,7 @@ pipeline {
      stage('docker login') {
        steps{
          container ('nodejs') {
-           sh 'echo $DOCKERHUB_CREDENTIAL_PSW  | crictl login -u $DOCKERHUB_CREDENTIAL_USR --password-stdin'
+           sh 'echo $DOCKERHUB_CREDENTIAL_PSW  | docker login -u $DOCKERHUB_CREDENTIAL_USR --password-stdin'
          }
        }
      }
@@ -30,8 +30,8 @@ pipeline {
      stage('build & push') {
        steps {
          container ('nodejs') {
-           sh 'containerd build -t $REGISTRY/$DOCKERHUB_USERNAME/$APP_NAME .'
-           sh 'containerd push $REGISTRY/$DOCKERHUB_USERNAME/$APP_NAME'
+           sh 'docker build -t $REGISTRY/$DOCKERHUB_USERNAME/$APP_NAME .'
+           sh 'docker push $REGISTRY/$DOCKERHUB_USERNAME/$APP_NAME'
          }
        }
      }
