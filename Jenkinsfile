@@ -3,7 +3,7 @@ def imageTags = ['latest', '${BUILD_NUMBER}']
 pipeline {
     agent {
         node {
-            label 'base'
+            label 'any'
         }
     }
 
