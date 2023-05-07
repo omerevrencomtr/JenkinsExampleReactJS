@@ -23,7 +23,7 @@ pipeline {
             steps {
                 script {
                     container('base') {
-                        docker.withRegistry("http://${REGISTRY}", REGISTRY_CREDENTIAL) {
+                        docker.withRegistry("http://${DOCKER_REGISTRY}", REGISTRY_CREDENTIAL) {
                             dockerImage = docker.build(IMAGE_NAME, BUILD_ARGS, null)
                         }
                     }
@@ -35,7 +35,7 @@ pipeline {
             steps {
                 script {
                     container('base') {
-                        docker.withRegistry("http://${REGISTRY}", REGISTRY_CREDENTIAL) {
+                        docker.withRegistry("http://${DOCKER_REGISTRY}", REGISTRY_CREDENTIAL) {
                             for (int i = 0; i < imageTags.size(); ++i) {
                                 dockerImage.push("${imageTags[i]}")
                             }
