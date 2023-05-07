@@ -1,7 +1,9 @@
 pipeline {
    agent {
-     label 'nodejs'
-   }
+          node {
+              label 'base'
+          }
+      }
 
    environment {
      // the address of your Docker Hub registry
@@ -16,6 +18,23 @@ pipeline {
      KUBECONFIG_CREDENTIAL_ID = 'kubeconfig'
      // the name of the project you created in KubeSphere, not the DevOps project name
      PROJECT_NAME = 'lamots-dev'
+     imageName = "xpermeet/web"
+     buildArgs = "-f Dockerfile . --network host"
+     dockerImage = ''
+     registryUrl = 'https://docker-push.xperlms.com'
+     registryCredential = 'docker-registery'
+
+   }
+   stage('Build') {
+               steps {
+                   script {
+                       container('base') {
+                           docker.withRegistry(registryUrl, registryCredential) {
+                               dockerImage = docker.build(imageName, buildArgs)
+                           }
+                       }
+                   }
+               }
    }
 
    stages {

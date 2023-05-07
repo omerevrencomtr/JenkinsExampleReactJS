@@ -1,52 +1,74 @@
+def imageTags = ['WEB_IMAGE_TAG', 'latest', '${BUILD_NUMBER}']
+
 pipeline {
-   agent {
-     label 'node'
-   }
-
-   environment {
-     // the address of your Docker Hub registry
-     REGISTRY = 'https://index.docker.io/v2/'
-     // your Docker Hub username
-     DOCKERHUB_USERNAME = 'omerevrencomtr'
-     // Docker image name
-     APP_NAME = 'JenkinsExampleReactJs'
-     // 'dockerhubid' is the credentials ID you created in KubeSphere with Docker Hub Access Token
-     DOCKERHUB_CREDENTIAL = credentials('dockerhub-omerevrencomtr')
-     // the kubeconfig credentials ID you created in KubeSphere
-     KUBECONFIG_CREDENTIAL_ID = 'kubeconfig'
-     // the name of the project you created in KubeSphere, not the DevOps project name
-     PROJECT_NAME = 'lamots-dev'
-   }
-
-   stages {
-     stage('docker login') {
-       steps{
-         container ('node') {
-           sh 'echo $DOCKERHUB_CREDENTIAL_PSW  | docker login -u $DOCKERHUB_CREDENTIAL_USR --password-stdin'
-         }
-       }
-     }
-
-     stage('build & push') {
-       steps {
-         container ('node') {
-           sh 'docker build -t $REGISTRY/$DOCKERHUB_USERNAME/$APP_NAME .'
-           sh 'docker push $REGISTRY/$DOCKERHUB_USERNAME/$APP_NAME'
-         }
-       }
-     }
-     stage ('deploy app') {
-       steps {
-          container ('node') {
-             withCredentials([
-               kubeconfigFile(
-                 credentialsId: env.KUBECONFIG_CREDENTIAL_ID,
-                 variable: 'KUBECONFIG')
-               ]) {
-               sh 'envsubst < JenkinsExampleReactJS/manifest/deploy.yaml | kubectl apply -f -'
-             }
-          }
-       }
+    environment {
+        dockerImage = ''
+        registryUrl = 'https://docker-push.xperlms.com'
+        registryCredential = 'docker-registery'
+        imageName = "xpermeet/web"
+        buildArgs = "-f dev.Dockerfile . --network host"
+        gitCredential = 'codecommit'
+        xpermeetLibGitUrl = 'https://git-codecommit.eu-west-1.amazonaws.com/v1/repos/xpermeet-lib'
+        xperDriveLibGitUrl = 'https://git-codecommit.eu-west-1.amazonaws.com/v1/repos/xperdrive-lib'
     }
-  }
+    agent {
+        node {
+            label 'base'
+        }
+    }
+    stages {
+        stage('Cloning Git xpermeet-lib') {
+            steps {
+                sh 'mkdir -p xpermeet-lib'
+                dir("xpermeet-lib") {
+                    git branch: "genel-kurul-dev", credentialsId: gitCredential, url: xpermeetLibGitUrl
+                }
+            }
+        }
+        stage('Cloning Git xperdrive-lib') {
+            steps {
+                sh 'mkdir -p xperdrive-lib'
+                dir("xperdrive-lib") {
+                    git branch: "master", credentialsId: gitCredential, url: xperDriveLibGitUrl
+                }
+            }
+        }
+        stage('Build') {
+            steps {
+                script {
+                    container('base') {
+                        docker.withRegistry(registryUrl, registryCredential) {
+                            dockerImage = docker.build(imageName, buildArgs)
+                        }
+                    }
+                }
+            }
+        }
+        stage('Push') {
+            steps {
+                script {
+                    container('base') {
+                        docker.withRegistry(registryUrl, registryCredential) {
+                            for (int i = 0; i < imageTags.size(); ++i) {
+                                dockerImage.push("${imageTags[i]}")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        stage('Trigger Deploy') {
+            steps {
+                script {
+                    ret = build(job: "egk-testtpdpx/web-fe-deploy/eks-egk-test",
+                            parameters: [
+                                    string(name: "WEB_IMAGE_TAG", value: "${BUILD_NUMBER}"),
+                            ],
+                            propagate: true,
+                            wait: true)
+                    currentBuild.result = ret.result
+                }
+            }
+        }
+    }
 }
