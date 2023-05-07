@@ -25,25 +25,19 @@ pipeline {
      registryCredential = 'docker-registery'
 
    }
-   stage('Build') {
-               steps {
-                   script {
-                       container('base') {
-                           docker.withRegistry(registryUrl, registryCredential) {
-                               dockerImage = docker.build(imageName, buildArgs)
-                           }
-                       }
-                   }
-               }
-   }
+
 
    stages {
      stage('docker login') {
-       steps{
-         container ('nodejs') {
-           sh 'echo $DOCKERHUB_CREDENTIAL_PSW  | docker login -u $DOCKERHUB_CREDENTIAL_USR --password-stdin'
-         }
-       }
+       steps {
+                          script {
+                              container('base') {
+                                  docker.withRegistry(registryUrl, registryCredential) {
+                                      dockerImage = docker.build(imageName, buildArgs)
+                                  }
+                              }
+                          }
+                      }
      }
 
      stage('build & push') {
