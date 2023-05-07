@@ -3,7 +3,7 @@ def imageTags = ['latest', '${BUILD_NUMBER}']
 pipeline {
     agent {
         node {
-            label 'maven'
+            label 'base'
         }
     }
 
@@ -21,16 +21,18 @@ pipeline {
 
     stages {
         stage('sonarqube analysis') {
-          steps {
-            container('maven') {
-              withCredentials([string(credentialsId: env.SONAR_CREDENTIAL_ID, variable: 'SONAR_TOKEN')]) {
-                withSonarQubeEnv('sonar') {
-                  sh 'mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN'
+              steps {
+                container('maven') {
+                  withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    withSonarQubeEnv('sonar') {
+                      sh "mvn sonar:sonar -Dsonar.host.url=http://172.16.161.11:30199 -Dsonar.login=$SONAR_TOKEN"
+                    }
+
+                  }
                 }
+
               }
             }
-          }
-        }
 
         stage('Build') {
             steps {
