@@ -9,8 +9,8 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = ''
-        REGISTRY = ''
-        REGISTRY_CREDENTIAL = 'dockerhub-omerevrencomtr'
+        REGISTRY = 'https://nexus.miateknoloji.io'
+        REGISTRY_CREDENTIAL = 'nexus-admin'
         IMAGE_NAME = 'omerevrencomtr/lamots'
         BUILD_ARGS = "-f Dockerfile . --network host"
         DEPLOY_TAG = "latest"
