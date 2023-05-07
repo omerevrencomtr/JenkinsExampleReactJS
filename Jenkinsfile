@@ -23,8 +23,8 @@ pipeline {
             steps {
                 script {
                     container('base') {
-                        docker.withRegistry(registryUrl, registryCredential) {
-                            dockerImage = docker.build(imageName, buildArgs)
+                        docker.withRegistry(REGISTRY, REGISTRY_CREDENTIAL) {
+                            dockerImage = docker.build(IMAGE_NAME, BUILD_ARGS)
                         }
                     }
                 }
@@ -35,7 +35,7 @@ pipeline {
             steps {
                 script {
                     container('base') {
-                        docker.withRegistry(registryUrl, registryCredential) {
+                        docker.withRegistry(REGISTRY, REGISTRY_CREDENTIAL) {
                             for (int i = 0; i < imageTags.size(); ++i) {
                                 dockerImage.push("${imageTags[i]}")
                             }
@@ -50,7 +50,7 @@ pipeline {
                 script {
                     withCredentials([
                             kubeconfigFile(
-                                    credentialsId: env.KUBECONFIG_CREDENTIAL_ID,
+                                    credentialsId: KUBECONFIG_CREDENTIAL_ID,
                                     variable: 'KUBECONFIG')
                     ]) {
                         sh 'envsubst < manifest/deploy.yaml | kubectl apply -f -'
