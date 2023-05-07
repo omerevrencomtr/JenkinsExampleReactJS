@@ -17,4 +17,4 @@ spec:
     spec:
       containers:
         - name: npm
-          image: $REGISTRY/$DOCKERHUB_USERNAME/$APP_NAME
+          image: $REGISTRY/$IMAGE_NAME/$DEPLOY_TAG

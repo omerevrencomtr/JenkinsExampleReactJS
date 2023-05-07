@@ -1,38 +1,23 @@
-def imageTags = ['WEB_IMAGE_TAG', 'latest', '${BUILD_NUMBER}']
+def imageTags = ['IMAGE_TAG', 'latest', '${BUILD_NUMBER}']
 
 pipeline {
-    environment {
-        dockerImage = ''
-        registryUrl = 'https://docker-push.xperlms.com'
-        registryCredential = 'docker-registery'
-        imageName = "xpermeet/web"
-        buildArgs = "-f dev.Dockerfile . --network host"
-        gitCredential = 'codecommit'
-        xpermeetLibGitUrl = 'https://git-codecommit.eu-west-1.amazonaws.com/v1/repos/xpermeet-lib'
-        xperDriveLibGitUrl = 'https://git-codecommit.eu-west-1.amazonaws.com/v1/repos/xperdrive-lib'
-    }
     agent {
         node {
             label 'base'
         }
     }
+
+    environment {
+        DOCKER_IMAGE = ''
+        REGISTRY = 'docker.io'
+        REGISTRY_CREDENTIAL = 'dockerhub-omerevrencomtr'
+        IMAGE_NAME = 'omerevrencomtr/lamots'
+        BUILD_ARGS = "-f Dockerfile . --network host"
+        KUBECONFIG_CREDENTIAL_ID = 'kubeconfig'
+    }
+
+
     stages {
-        stage('Cloning Git xpermeet-lib') {
-            steps {
-                sh 'mkdir -p xpermeet-lib'
-                dir("xpermeet-lib") {
-                    git branch: "genel-kurul-dev", credentialsId: gitCredential, url: xpermeetLibGitUrl
-                }
-            }
-        }
-        stage('Cloning Git xperdrive-lib') {
-            steps {
-                sh 'mkdir -p xperdrive-lib'
-                dir("xperdrive-lib") {
-                    git branch: "master", credentialsId: gitCredential, url: xperDriveLibGitUrl
-                }
-            }
-        }
         stage('Build') {
             steps {
                 script {
@@ -44,6 +29,7 @@ pipeline {
                 }
             }
         }
+
         stage('Push') {
             steps {
                 script {
@@ -57,18 +43,20 @@ pipeline {
                 }
             }
         }
+
         stage('Trigger Deploy') {
             steps {
                 script {
-                    ret = build(job: "egk-testtpdpx/web-fe-deploy/eks-egk-test",
-                            parameters: [
-                                    string(name: "WEB_IMAGE_TAG", value: "${BUILD_NUMBER}"),
-                            ],
-                            propagate: true,
-                            wait: true)
-                    currentBuild.result = ret.result
+                    withCredentials([
+                            kubeconfigFile(
+                                    credentialsId: env.KUBECONFIG_CREDENTIAL_ID,
+                                    variable: 'KUBECONFIG')
+                    ]) {
+                        sh 'envsubst < manifest/deploy.yaml | kubectl apply -f -'
+                    }
                 }
             }
         }
+
     }
 }

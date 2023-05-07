@@ -13,7 +13,6 @@ pipeline {
      REGISTRY_CREDENTIAL = 'dockerhub-omerevrencomtr'
      IMAGE_NAME = 'omerevrencomtr/lamots'
      BUILD_ARGS = "-f Dockerfile . --network host"
-     DEPLOY_TAG = "latest"
    }
 
 
