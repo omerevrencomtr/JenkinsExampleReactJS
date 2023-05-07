@@ -29,12 +29,12 @@ pipeline {
 
    stages {
      stage('docker login') {
-       steps {
+                      steps {
                           script {
                               container('base') {
-                                  docker.withRegistry(registryUrl, registryCredential) {
+
                                       dockerImage = docker.build(imageName, buildArgs)
-                                  }
+
                               }
                           }
                       }
