@@ -9,7 +9,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = ''
-        REGISTRY = 'docker.io'
+        REGISTRY = ''
         REGISTRY_CREDENTIAL = 'dockerhub-omerevrencomtr'
         IMAGE_NAME = 'omerevrencomtr/lamots'
         BUILD_ARGS = "-f Dockerfile . --network host"
