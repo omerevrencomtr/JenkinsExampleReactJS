@@ -23,12 +23,9 @@ pipeline {
         stage('sonarqube analysis') {
               steps {
                 container('maven') {
-                  withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                    withSonarQubeEnv('sonar') {
-                      sh "mvn sonar:sonar -Dsonar.host.url=http://172.16.161.11:30199 -Dsonar.login=$SONAR_TOKEN"
-                    }
-
-                  }
+                  withSonarQubeEnv('sonar') {
+                                        sh "mvn sonar:sonar -Dsonar.host.url=http://172.16.161.11:30199 -Dsonar.login=eb4464c767748dadbd599ddac100b6d1b07f088f"
+                                      }
                 }
 
               }
