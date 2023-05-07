@@ -15,10 +15,25 @@ pipeline {
         BUILD_ARGS = "-f Dockerfile . --network host"
         DEPLOY_TAG = "latest"
         KUBECONFIG_CREDENTIAL_ID = 'kubeconfig'
+        SONAR_CREDENTIAL_ID = 'sonar-token'
     }
 
 
     stages {
+        stage('sonarqube analysis') {
+              steps {
+                container('maven') {
+                  withCredentials([string(credentialsId: "$SONAR_CREDENTIAL_ID", variable: 'SONAR_TOKEN')]) {
+                    withSonarQubeEnv('sonar') {
+                      sh "mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN"
+                    }
+
+                  }
+                }
+
+              }
+            }
+
         stage('Build') {
             steps {
                 script {
